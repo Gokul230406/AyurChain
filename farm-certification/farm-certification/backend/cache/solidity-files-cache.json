@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Full Stack\\Projects\\Ayurchain\\farm-certification\\farm-certification\\backend\\contracts\\FarmCert.sol": {
+      "lastModificationDate": 1784439793423,
+      "contentHash": "648ebe983ae4c88904b119e84267320d",
+      "sourceName": "contracts/FarmCert.sol",
+      "solcConfig": {
+        "version": "0.8.19",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "FarmCert"
+      ]
+    }
+  }
+}

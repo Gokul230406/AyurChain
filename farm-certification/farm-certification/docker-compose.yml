@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: farm_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  ipfs-farmer:
+    image: ipfs/kubo:latest
+    container_name: ipfs_farmer
+    command: daemon
+    ports:
+      - "4001:4001"
+      - "5001:5001"
+      - "8080:8080"
+    volumes:
+      - farmer_ipfs:/data/ipfs
+
+  ipfs-admin:
+    image: ipfs/kubo:latest
+    container_name: ipfs_admin
+    command: daemon
+    ports:
+      - "4101:4001"
+      - "5101:5001"
+      - "8180:8080"
+    volumes:
+      - admin_ipfs:/data/ipfs
+
+  hardhat:
+    build: ./backend
+    container_name: farm_hardhat
+    command: npx hardhat node --hostname 0.0.0.0
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./backend:/usr/src/app
+
+  backend:
+    build: ./backend
+    container_name: farm_backend
+    command: node server.js
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/farmdb
+      - IPFS_API=http://ipfs-farmer:5001
+      - RPC_URL=http://hardhat:8545
+      - CONTRACT_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
+    depends_on:
+      - mongo
+      - ipfs-farmer
+      - hardhat
+
+
+volumes:
+  mongo_data:
+  farmer_ipfs:
+  admin_ipfs:
