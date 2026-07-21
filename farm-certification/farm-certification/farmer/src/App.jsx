@@ -573,6 +573,12 @@ function App() {
                   {loginError && <div className="error-alert">{loginError}</div>}
                   <button type="submit" className="primary-btn submit-login-btn">Sign In</button>
                 </form>
+                <div style={{ textAlign:'center', margin:'.75rem 0 .4rem', fontSize:'.82rem' }}>
+                  <span style={{ color:'var(--text-3)' }}>New user?</span>{' '}
+                  <button className="link-btn" onClick={() => { setLoginTab('signup'); setSignupError(''); setSignupSuccess(''); }}>
+                    Register here
+                  </button>
+                </div>
                 <div className="demo-creds">
                   <span className="demo-label">Demo:</span>
                   <span><code>farmer1</code> / <code>farmerpassword</code></span>
@@ -580,7 +586,42 @@ function App() {
               </div>
             )}
 
-
+            {/* Farmer Sign Up (shown when Register is clicked) */}
+            {loginTab === 'signup' && (
+              <div className="login-card glass-panel">
+                <div className="login-card-header">
+                  <div className="login-icon-ring">✨</div>
+                  <h2>Create Farmer Account</h2>
+                  <p>Register to submit herb certifications on AyurChain</p>
+                </div>
+                <form onSubmit={handleSignup} className="login-form">
+                  <div className="form-group">
+                    <label htmlFor="su-un">Username <span className="req-star">*</span></label>
+                    <input type="text" id="su-un" placeholder="Choose a unique username (min 3 chars)"
+                      value={signupForm.username} onChange={e => setSignupForm(p => ({ ...p, username: e.target.value }))} required minLength={3} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="su-pw">Password <span className="req-star">*</span></label>
+                    <input type="password" id="su-pw" placeholder="Choose a password (min 6 chars)"
+                      value={signupForm.password} onChange={e => setSignupForm(p => ({ ...p, password: e.target.value }))} required minLength={6} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="su-pw2">Confirm Password <span className="req-star">*</span></label>
+                    <input type="password" id="su-pw2" placeholder="Re-enter password"
+                      value={signupForm.confirm} onChange={e => setSignupForm(p => ({ ...p, confirm: e.target.value }))} required />
+                  </div>
+                  {signupError && <div className="error-alert">{signupError}</div>}
+                  {signupSuccess && <div className="success-alert">{signupSuccess}</div>}
+                  <button type="submit" className="primary-btn submit-login-btn">🌿 Create Account</button>
+                </form>
+                <div style={{ textAlign:'center', marginTop:'.75rem', fontSize:'.82rem', color:'var(--text-3)' }}>
+                  Already have an account?{' '}
+                  <button className="link-btn" onClick={() => { setLoginTab('farmer'); setSignupError(''); setSignupSuccess(''); }}>
+                    Sign in
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Admin Portal (hidden, accessed via ?admin=true) */}
             {loginTab === 'admin' && adminUnlocked && (
