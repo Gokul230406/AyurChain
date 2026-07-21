@@ -283,4 +283,9 @@ router.get('/', (req, res) => {
 app.use('/api', router);
 app.use('/', router);
 
-app.listen(3000, () => console.log('Backend running on 3000'));
+// Only start HTTP server in local dev — Vercel manages the serverless lifecycle
+if (!process.env.VERCEL) {
+  app.listen(3000, () => console.log('Backend running on 3000'));
+}
+
+export default app;
