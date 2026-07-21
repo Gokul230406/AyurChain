@@ -79,10 +79,27 @@ body {
 
 .app-wrapper { display:flex; flex-direction:column; min-height:100vh; width:100%; }
 
-.code-font { font-family:var(--mono); font-size:.82em; letter-spacing:-.2px; word-break:break-all; }
+.code-font { font-family:var(--mono); font-size:.82em; letter-spacing:-.2px; word-break:break-all; overflow-wrap:anywhere; }
 .small-text { font-size:.78em; }
 .mt-1 { margin-top:.5rem; }
+.mt-2 { margin-top:1rem; }
+.mt-3 { margin-top:1.5rem; }
 .w-full { width:100%; }
+
+/* Link-style button */
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font-size: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+}
+.link-btn:hover { color: var(--accent-h); }
 
 /* ════════════════════════════════════
    NAVBAR
@@ -1013,9 +1030,9 @@ code { font-family:var(--mono); background:rgba(255,255,255,.07); padding:.1em .
 }
 @media (max-width:540px) { .cert-fields-grid { grid-template-columns:1fr; } }
 
-.cert-field { display:flex; flex-direction:column; gap:.3rem; }
+.cert-field { display:flex; flex-direction:column; gap:.3rem; min-width:0; }
 .cf-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--text-3); }
-.cf-value { font-size:.88rem; font-weight:500; }
+.cf-value { font-size:.88rem; font-weight:500; word-break:break-word; overflow-wrap:anywhere; }
 .herb-name-cert { font-style:italic; font-weight:700; font-size:1rem; }
 .rejection-field { grid-column:1/-1; background:rgba(239,68,68,.07); border-radius:var(--radius-sm); padding:.65rem; border-left:3px solid var(--danger); }
 
@@ -1025,14 +1042,25 @@ code { font-family:var(--mono); background:rgba(255,255,255,.07); padding:.1em .
 .timeline { display:flex; flex-direction:column; gap:.65rem; }
 .timeline-step { display:flex; align-items:flex-start; gap:.85rem; }
 .timeline-dot { font-size:1.1rem; flex-shrink:0; margin-top:.05rem; }
-.timeline-content { flex:1; }
-.timeline-label { font-size:.88rem; font-weight:700; }
-.timeline-desc  { font-size:.78rem; color:var(--text-2); margin-top:.2rem; line-height:1.5; }
+.timeline-content { flex:1; min-width:0; }
+.timeline-label { font-size:.88rem; font-weight:700; word-break:break-word; }
+.timeline-desc  { font-size:.78rem; color:var(--text-2); margin-top:.2rem; line-height:1.5; word-break:break-word; overflow-wrap:anywhere; }
 .timeline-step.done .timeline-label { color:var(--text-1); }
 .timeline-step.pending .timeline-label { color:var(--text-3); }
 
-.cert-footer { font-size:.78rem; color:var(--text-3); text-align:center; font-style:italic; }
+.cert-footer { font-size:.78rem; color:var(--text-3); text-align:center; font-style:italic; word-break:break-word; }
 .cert-qr-footer { display:flex; justify-content:center; margin-top:1rem; }
+
+/* Cert signatures — stack on mobile */
+@media (max-width: 600px) {
+  .cert-signatures { flex-direction: column; align-items: center; gap: 1.5rem; }
+  .certificate-card { padding: 1.1rem; }
+  .verify-view { gap: 1rem; }
+  .cert-fields-grid { grid-template-columns: 1fr; }
+  .cert-header { flex-direction: column; align-items: center; text-align: center; }
+  .verify-actions { flex-direction: column; }
+  .verify-actions button { width: 100%; }
+}
 
 /* Verify actions */
 .verify-actions { display:flex; gap:.75rem; flex-wrap:wrap; }
