@@ -7,7 +7,9 @@
     "dev:backend": "npm --prefix \"farm-certification/farm-certification/backend\" start",
     "dev:frontend": "npm --prefix \"farm-certification/farm-certification/farmer\" run dev",
     "dev": "npx concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "build": "npm --prefix \"farm-certification/farm-certification/farmer\" run build",
+    "install:all": "npm --prefix \"farm-certification/farm-certification/farmer\" install && npm --prefix \"farm-certification/farm-certification/backend\" install",
+    "build": "npm --prefix \"farm-certification/farm-certification/farmer\" install && npm --prefix \"farm-certification/farm-certification/farmer\" run build",
+    "vercel-build": "npm --prefix \"farm-certification/farm-certification/farmer\" install && npm --prefix \"farm-certification/farm-certification/farmer\" run build",
     "start": "npm run dev"
   },
   "devDependencies": {
