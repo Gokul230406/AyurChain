@@ -2,6 +2,7 @@
   "name": "ayurchain",
   "version": "1.0.0",
   "private": true,
+  "engines": { "node": "20.x" },
   "description": "AyurChain - Combined Ayurvedic Herb Supply Chain Platform",
   "scripts": {
     "dev:backend": "npm --prefix \"farm-certification/farm-certification/backend\" start",
