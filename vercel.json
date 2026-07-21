@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "installCommand": "npm --prefix \"farm-certification/farm-certification/farmer\" install && npm --prefix \"farm-certification/farm-certification/backend\" install",
+  "installCommand": "npm install && npm --prefix \"farm-certification/farm-certification/farmer\" install",
   "buildCommand": "npm --prefix \"farm-certification/farm-certification/farmer\" run build",
   "outputDirectory": "farm-certification/farm-certification/farmer/dist",
   "functions": {
