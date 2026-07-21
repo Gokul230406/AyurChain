@@ -13,15 +13,32 @@ const fetchJson = async (url, options) => {
   return res.json();
 };
 
+/* ─── Farmer Account Storage (localStorage) ─── */
+const DEFAULT_FARMERS = [{ username: 'farmer1', password: 'farmerpassword' }];
+const loadFarmers = () => {
+  try {
+    const stored = localStorage.getItem('ayurchain_farmers');
+    return stored ? JSON.parse(stored) : DEFAULT_FARMERS;
+  } catch { return DEFAULT_FARMERS; }
+};
+const saveFarmers = (list) => {
+  try { localStorage.setItem('ayurchain_farmers', JSON.stringify(list)); } catch {}
+};
+
 function App() {
   /* ─── Global State ─── */
   const [theme, setTheme]               = useState('dark'); // 'dark' | 'light'
   const [currentView, setCurrentView]   = useState('login'); // 'login' | 'farmer_dashboard' | 'admin_dashboard' | 'verify'
   const [userRole, setUserRole]         = useState(null); // 'farmer' | 'admin' | null
-  const [loginTab, setLoginTab]         = useState('farmer'); // 'farmer' | 'admin' | 'verify'
+  const [loginTab, setLoginTab]         = useState('farmer'); // 'farmer' | 'signup' | 'verify'
   const [loginForm, setLoginForm]       = useState({ username: '', password: '' });
   const [loginError, setLoginError]     = useState('');
   const [previewImage, setPreviewImage] = useState(null); // image preview lightbox
+  const [farmerAccounts, setFarmerAccounts] = useState(loadFarmers);
+  const [signupForm, setSignupForm]     = useState({ username: '', password: '', confirm: '' });
+  const [signupError, setSignupError]   = useState('');
+  const [signupSuccess, setSignupSuccess] = useState('');
+  const [adminUnlocked, setAdminUnlocked] = useState(false); // hidden admin access via URL param
 
   /* ─── Farmer Dashboard ─── */
   const [farmerTab, setFarmerTab]       = useState('submit'); // 'submit' | 'history'
@@ -384,26 +401,52 @@ function App() {
   };
 
   /* ══════════════════════════════════════════════════
-     LOGIN / LOGOUT
+     LOGIN / LOGOUT / SIGNUP
   ══════════════════════════════════════════════════ */
+  // Check URL param for admin access
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === 'true') {
+      setAdminUnlocked(true);
+      setLoginTab('admin');
+    }
+  }, []); // eslint-disable-line
+
   const handleLogin = (e) => {
     e.preventDefault(); setLoginError('');
     const { username, password } = loginForm;
     if (loginTab === 'farmer') {
-      if (username === 'farmer1' && password === 'farmerpassword') {
+      const match = farmerAccounts.find(f => f.username === username && f.password === password);
+      if (match) {
         setUserRole('farmer'); setCurrentView('farmer_dashboard'); fetchFarmerHistory();
       } else { setLoginError('Invalid farmer credentials.'); }
-    } else {
+    } else if (loginTab === 'admin') {
       if (username === 'admin' && password === 'admin') {
         setUserRole('admin'); setCurrentView('admin_dashboard'); fetchAllAdminRecords();
       } else { setLoginError('Invalid admin credentials.'); }
     }
   };
 
+  const handleSignup = (e) => {
+    e.preventDefault(); setSignupError(''); setSignupSuccess('');
+    const { username, password, confirm } = signupForm;
+    if (!username.trim() || username.length < 3) { setSignupError('Username must be at least 3 characters.'); return; }
+    if (password.length < 6) { setSignupError('Password must be at least 6 characters.'); return; }
+    if (password !== confirm) { setSignupError('Passwords do not match.'); return; }
+    if (farmerAccounts.find(f => f.username === username)) { setSignupError('Username already taken. Please choose another.'); return; }
+    const updated = [...farmerAccounts, { username, password }];
+    saveFarmers(updated);
+    setFarmerAccounts(updated);
+    setSignupSuccess(`Account "${username}" created! You can now sign in.`);
+    setSignupForm({ username: '', password: '', confirm: '' });
+    setTimeout(() => { setLoginTab('farmer'); setSignupSuccess(''); setLoginForm({ username, password: '' }); }, 2000);
+  };
+
   const handleLogout = () => {
     setUserRole(null); setCurrentView('login'); setSubmitResult(null);
     setLoginForm({ username: '', password: '' }); setAdminTab('overview');
     setFarmerTab('submit'); setFarmerHistory([]);
+    setLoginTab('farmer'); setLoginError(''); setSignupError(''); setSignupSuccess('');
   };
 
   /* ══════════════════════════════════════════════════
@@ -496,7 +539,11 @@ function App() {
         {currentView === 'login' && (
           <div className={`login-container animate-fade-in ${loginTab === 'verify' ? 'verify-mode' : ''}`}>
             <div className="login-tabs-bar">
-              {[['farmer','🌾 Farmer'],['admin','🔒 Admin'],['verify','🔍 Verify']].map(([t, label]) => (
+              {[
+                ['farmer', '🌾 Sign In'],
+                ['verify', '🔍 Verify'],
+                ...(adminUnlocked ? [['admin', '🔒 Admin']] : [])
+              ].map(([t, label]) => (
                 <button key={t} className={`login-tab-btn ${loginTab === t ? 'active' : ''}`}
                   onClick={() => { setLoginTab(t); setLoginError(''); setLoginForm({ username: '', password: '' }); }}>
                   {label}
@@ -504,18 +551,18 @@ function App() {
               ))}
             </div>
 
-            {/* Farmer / Admin Login */}
-            {(loginTab === 'farmer' || loginTab === 'admin') && (
+            {/* Farmer Sign In */}
+            {loginTab === 'farmer' && (
               <div className="login-card glass-panel">
                 <div className="login-card-header">
-                  <div className="login-icon-ring">{loginTab === 'farmer' ? '🌿' : '🛡️'}</div>
-                  <h2>{loginTab === 'farmer' ? 'Farmer Portal' : 'Admin Portal'}</h2>
-                  <p>{loginTab === 'farmer' ? 'Access your AyurChain farming profile' : 'Administrative secure access'}</p>
+                  <div className="login-icon-ring">🌿</div>
+                  <h2>Farmer Portal</h2>
+                  <p>Access your AyurChain farming profile</p>
                 </div>
                 <form onSubmit={handleLogin} className="login-form">
                   <div className="form-group">
                     <label htmlFor="un">Username</label>
-                    <input type="text" id="un" placeholder={loginTab === 'farmer' ? 'e.g. farmer1' : 'e.g. admin'}
+                    <input type="text" id="un" placeholder="Enter your username"
                       value={loginForm.username} onChange={e => setLoginForm(p => ({ ...p, username: e.target.value }))} required />
                   </div>
                   <div className="form-group">
@@ -524,14 +571,80 @@ function App() {
                       value={loginForm.password} onChange={e => setLoginForm(p => ({ ...p, password: e.target.value }))} required />
                   </div>
                   {loginError && <div className="error-alert">{loginError}</div>}
+                  <button type="submit" className="primary-btn submit-login-btn">Sign In</button>
+                </form>
+                <div style={{ textAlign:'center', margin:'.75rem 0 .4rem', fontSize:'.82rem' }}>
+                  <span style={{ color:'var(--text-3)' }}>New user?</span>{' '}
+                  <button className="link-btn" onClick={() => { setLoginTab('signup'); setSignupError(''); setSignupSuccess(''); }}>
+                    Register here
+                  </button>
+                </div>
+                <div className="demo-creds">
+                  <span className="demo-label">Demo:</span>
+                  <span><code>farmer1</code> / <code>farmerpassword</code></span>
+                </div>
+              </div>
+            )}
+
+            {/* Farmer Sign Up (shown when Register is clicked) */}
+            {loginTab === 'signup' && (
+              <div className="login-card glass-panel">
+                <div className="login-card-header">
+                  <div className="login-icon-ring">✨</div>
+                  <h2>Create Farmer Account</h2>
+                  <p>Register to submit herb certifications on AyurChain</p>
+                </div>
+                <form onSubmit={handleSignup} className="login-form">
+                  <div className="form-group">
+                    <label htmlFor="su-un">Username <span className="req-star">*</span></label>
+                    <input type="text" id="su-un" placeholder="Choose a unique username (min 3 chars)"
+                      value={signupForm.username} onChange={e => setSignupForm(p => ({ ...p, username: e.target.value }))} required minLength={3} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="su-pw">Password <span className="req-star">*</span></label>
+                    <input type="password" id="su-pw" placeholder="Choose a password (min 6 chars)"
+                      value={signupForm.password} onChange={e => setSignupForm(p => ({ ...p, password: e.target.value }))} required minLength={6} />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="su-pw2">Confirm Password <span className="req-star">*</span></label>
+                    <input type="password" id="su-pw2" placeholder="Re-enter password"
+                      value={signupForm.confirm} onChange={e => setSignupForm(p => ({ ...p, confirm: e.target.value }))} required />
+                  </div>
+                  {signupError && <div className="error-alert">{signupError}</div>}
+                  {signupSuccess && <div className="success-alert">{signupSuccess}</div>}
+                  <button type="submit" className="primary-btn submit-login-btn">🌿 Create Account</button>
+                </form>
+                <div style={{ textAlign:'center', marginTop:'.75rem', fontSize:'.82rem', color:'var(--text-3)' }}>
+                  Already have an account?{' '}
+                  <button className="link-btn" onClick={() => { setLoginTab('farmer'); setSignupError(''); setSignupSuccess(''); }}>
+                    Sign in
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Admin Portal (hidden, accessed via ?admin=true) */}
+            {loginTab === 'admin' && adminUnlocked && (
+              <div className="login-card glass-panel">
+                <div className="login-card-header">
+                  <div className="login-icon-ring">🛡️</div>
+                  <h2>Admin Portal</h2>
+                  <p>Administrative secure access</p>
+                </div>
+                <form onSubmit={handleLogin} className="login-form">
+                  <div className="form-group">
+                    <label htmlFor="adm-un">Username</label>
+                    <input type="text" id="adm-un" placeholder="admin"
+                      value={loginForm.username} onChange={e => setLoginForm(p => ({ ...p, username: e.target.value }))} required />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="adm-pw">Password</label>
+                    <input type="password" id="adm-pw" placeholder="Enter admin password"
+                      value={loginForm.password} onChange={e => setLoginForm(p => ({ ...p, password: e.target.value }))} required />
+                  </div>
+                  {loginError && <div className="error-alert">{loginError}</div>}
                   <button type="submit" className="primary-btn submit-login-btn">Authenticate</button>
                 </form>
-                <div className="demo-creds">
-                  <span className="demo-label">Demo credentials:</span>
-                  {loginTab === 'farmer'
-                    ? <span><code>farmer1</code> / <code>farmerpassword</code></span>
-                    : <span><code>admin</code> / <code>admin</code></span>}
-                </div>
               </div>
             )}
 
@@ -804,8 +917,8 @@ function App() {
                             🔍 View Details
                           </button>
                           {r.currentStage === 'completed' && (
-                            <button className="secondary-btn btn-sm" onClick={() => downloadQRImage(qrUrl(r), `${r.productId || 'AyurChain'}-QR.png`)}>
-                              ⬇️ Download QR
+                            <button className="secondary-btn btn-sm" onClick={() => { setSearchQuery(r.productId || r.hash); handleVerify(null, r.productId || r.hash); }}>
+                              📜 View Certificate
                             </button>
                           )}
                         </div>
@@ -1408,9 +1521,11 @@ function App() {
               <button onClick={() => setCurrentView(userRole ? `${userRole}_dashboard` : 'login')} className="secondary-btn">
                 ← Back to Portal
               </button>
-              <button onClick={() => downloadQRImage(qrUrl(verificationResult), `${verificationResult.productId || 'AyurChain'}-QR.png`)} className="secondary-btn">
-                ⬇️ Download QR Image
-              </button>
+              {userRole === 'admin' && (
+                <button onClick={() => downloadQRImage(qrUrl(verificationResult), `${verificationResult.productId || 'AyurChain'}-QR.png`)} className="secondary-btn">
+                  ⬇️ Download QR Image
+                </button>
+              )}
               <button onClick={handlePrintCertificate} className="primary-btn">
                 🖨️ Download / Print PDF
               </button>
