@@ -58,20 +58,31 @@ try {
   };
 }
 
-// Blockchain provider (with fallback)
+// Blockchain provider (lazy init – only connect when actually needed)
 let provider;
 let contract;
-if (process.env.CONTRACT_ADDRESS) {
+
+async function getContract() {
+  if (contract) return contract;
+  if (!process.env.CONTRACT_ADDRESS) return null;
   try {
-    provider = new JsonRpcProvider(process.env.RPC_URL || 'http://localhost:8545', undefined, { staticNetwork: true });
+    if (!provider) {
+      provider = new JsonRpcProvider(
+        process.env.RPC_URL || 'http://localhost:8545',
+        { chainId: 31337, name: 'hardhat' },
+        { staticNetwork: true }
+      );
+    }
     const abi = [
       'function certifyPlant(bytes32 hash) public',
       'event Certified(bytes32 hash)'
     ];
     const signer = await provider.getSigner();
     contract = new Contract(process.env.CONTRACT_ADDRESS, abi, signer);
+    return contract;
   } catch (err) {
-    console.warn('RPC / Contract initialization warning:', err.message);
+    console.warn('RPC / Contract unavailable:', err.message);
+    return null;
   }
 }
 
@@ -200,7 +211,8 @@ router.post('/admin/certify', async (req, res) => {
   try {
     const { hash } = req.body;
     await Record.updateOne({ hash }, { $set: { certified: true, currentStage: 'admin_approved' } });
-    if (contract) await contract.certifyPlant(hash);
+    const c = await getContract();
+    if (c) await c.certifyPlant(hash);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
