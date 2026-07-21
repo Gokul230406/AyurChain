@@ -1,0 +1,27 @@
+{
+  "name": "ayurchain",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "20.x" },
+  "description": "AyurChain - Combined Ayurvedic Herb Supply Chain Platform",
+  "scripts": {
+    "dev:backend": "npm --prefix \"farm-certification/farm-certification/backend\" start",
+    "dev:frontend": "npm --prefix \"farm-certification/farm-certification/farmer\" run dev",
+    "dev": "npx concurrently -n \"BACKEND,FRONTEND\" -c \"cyan,green\" \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "install:all": "npm --prefix \"farm-certification/farm-certification/farmer\" install && npm --prefix \"farm-certification/farm-certification/backend\" install",
+    "build": "npm --prefix \"farm-certification/farm-certification/farmer\" install && npm --prefix \"farm-certification/farm-certification/farmer\" run build",
+    "vercel-build": "npm --prefix \"farm-certification/farm-certification/farmer\" install && npm --prefix \"farm-certification/farm-certification/farmer\" run build",
+    "start": "npm run dev"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.0",
+    "ethers": "^6.11.0",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
