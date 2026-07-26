@@ -229,7 +229,7 @@ router.post('/admin/update-stage', async (req, res) => {
 /* ─── Root / Status ─── */
 router.get('/', (req, res) => {
   res.json({
-    message: 'AyurChain Farm Certification API',
+    message: 'Ervas Farm Certification API',
     status: 'running',
     version: '2.0.0',
     endpoints: {

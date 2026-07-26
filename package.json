@@ -1,10 +1,10 @@
 {
-  "name": "ayurchain",
+  "name": "ervas",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "engines": { "node": "20.x" },
-  "description": "AyurChain - Combined Ayurvedic Herb Supply Chain Platform",
+  "description": "Ervas - Combined Ayurvedic Herb Supply Chain Platform",
   "scripts": {
     "dev:backend": "npm --prefix \"farm-certification/farm-certification/backend\" start",
     "dev:frontend": "npm --prefix \"farm-certification/farm-certification/farmer\" run dev",
