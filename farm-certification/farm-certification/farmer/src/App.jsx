@@ -17,12 +17,12 @@ const fetchJson = async (url, options) => {
 const DEFAULT_FARMERS = [{ username: 'farmer1', password: 'farmerpassword' }];
 const loadFarmers = () => {
   try {
-    const stored = localStorage.getItem('ayurchain_farmers');
+    const stored = localStorage.getItem('ervas_farmers') || localStorage.getItem('ayurchain_farmers');
     return stored ? JSON.parse(stored) : DEFAULT_FARMERS;
   } catch { return DEFAULT_FARMERS; }
 };
 const saveFarmers = (list) => {
-  try { localStorage.setItem('ayurchain_farmers', JSON.stringify(list)); } catch {}
+  try { localStorage.setItem('ervas_farmers', JSON.stringify(list)); } catch {}
 };
 
 function App() {
@@ -288,7 +288,7 @@ function App() {
         cultivationDate: formData.cultivationDate, description: formData.description,
         quantity: formData.quantity, unit: formData.unit,
         photos: formData.photos, timestamp: new Date().toISOString(),
-        farmerId: loginForm.username || 'farmer1', farmerName: 'AyurChain Organic Grower'
+        farmerId: loginForm.username || 'farmer1', farmerName: 'Ervas Organic Grower'
       },
       geometry: { type: 'Point', coordinates: formData.location.split(',').map(Number) }
     };
@@ -461,7 +461,7 @@ function App() {
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = blobUrl;
-      a.download = filename || 'AyurChain-QR.png';
+      a.download = filename || 'Ervas-QR.png';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -508,13 +508,13 @@ function App() {
             setCurrentView('login');
             setLoginTab('farmer');
           }
-        }} title="Go to AyurChain Homepage">
+        }} title="Go to Ervas Homepage">
           <svg className="logo-icon" viewBox="0 0 24 24" fill="none">
             <path d="M12 2C6 8 4 12 6 17c2 4 8 5 12 1 1-6-2-12-6-16z" fill="currentColor" opacity=".9"/>
             <path d="M12 2c1 6 0 12-2 16" stroke="#fff" strokeWidth="1" strokeLinecap="round"/>
           </svg>
-          <span className="brand-text">AYUR<span className="accent-text">CHAIN</span></span>
-          <span className="brand-tagline">Premium Herbs Blockchain Verification</span>
+          <span className="brand-text">ER<span className="accent-text">VAS</span></span>
+          <span className="brand-tagline">Premium Herb Tracker</span>
         </div>
         <div className="header-actions">
           <button onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')} className="theme-toggle-btn" title="Toggle theme">
@@ -557,7 +557,7 @@ function App() {
                 <div className="login-card-header">
                   <div className="login-icon-ring">🌿</div>
                   <h2>Farmer Portal</h2>
-                  <p>Access your AyurChain farming profile</p>
+                  <p>Access your Ervas farming profile</p>
                 </div>
                 <form onSubmit={handleLogin} className="login-form">
                   <div className="form-group">
@@ -592,7 +592,7 @@ function App() {
                 <div className="login-card-header">
                   <div className="login-icon-ring">✨</div>
                   <h2>Create Farmer Account</h2>
-                  <p>Register to submit herb certifications on AyurChain</p>
+                  <p>Register to submit herb certifications on Ervas</p>
                 </div>
                 <form onSubmit={handleSignup} className="login-form">
                   <div className="form-group">
@@ -1337,7 +1337,7 @@ function App() {
           <div className="verify-view animate-fade-in" ref={printRef}>
             {/* Print-only header */}
             <div className="print-only-header">
-              <h1>AyurChain — Official Certificate of Compliance</h1>
+              <h1>Ervas — Official Certificate of Compliance</h1>
               <p>Cryptographic Botanical Supply Chain Verification & Quality Control Ledger</p>
             </div>
 
@@ -1348,7 +1348,7 @@ function App() {
                   {verificationResult.status === 'completed' || verificationResult.certified ? (
                     <div className="seal certified-seal">
                       <span className="seal-main">VERIFIED</span>
-                      <span className="seal-sub">AYURCHAIN SECURE</span>
+                      <span className="seal-sub">ERVAS SECURE</span>
                     </div>
                   ) : verificationResult.rejected ? (
                     <div className="seal rejected-seal">
@@ -1364,7 +1364,7 @@ function App() {
                 </div>
                 <div className="cert-title-area">
                   <h2>CERTIFICATE OF COMPLIANCE</h2>
-                  <p className="cert-subtitle">AyurChain Cryptographic Herb Integrity Registry</p>
+                  <p className="cert-subtitle">Ervas Cryptographic Herb Integrity Registry</p>
                   <div className="cert-id-row">
                     <span className="cert-pid">Product ID: <strong>{verificationResult.productId || '—'}</strong></span>
                   </div>
@@ -1481,7 +1481,7 @@ function App() {
 
                 <div className="digital-sig-wrapper cert-stamp-center">
                   <div className="official-stamp-seal">
-                    <span className="stamp-top">AYURCHAIN</span>
+                    <span className="stamp-top">ERVAS</span>
                     <span className="stamp-center">SECURE</span>
                     <span className="stamp-bottom">VERIFIED</span>
                   </div>
@@ -1496,7 +1496,7 @@ function App() {
                     <span className="sig-badge blue-sig">✓ LEDGER VERIFIED</span>
                   </div>
                   <div className="sig-line"></div>
-                  <p className="sig-name">AyurChain Cryptographic Core</p>
+                  <p className="sig-name">Ervas Cryptographic Core</p>
                   <p className="sig-title">Immutable Ledger Protocol</p>
                   <p className="sig-meta">Hash: {verificationResult.hash?.slice(0, 14)}…</p>
                 </div>
@@ -1522,7 +1522,7 @@ function App() {
                 ← Back to Portal
               </button>
               {userRole === 'admin' && (
-                <button onClick={() => downloadQRImage(qrUrl(verificationResult), `${verificationResult.productId || 'AyurChain'}-QR.png`)} className="secondary-btn">
+                <button onClick={() => downloadQRImage(qrUrl(verificationResult), `${verificationResult.productId || 'Ervas'}-QR.png`)} className="secondary-btn">
                   ⬇️ Download QR Image
                 </button>
               )}
@@ -1542,7 +1542,7 @@ function App() {
             <button className="close-preview-btn" onClick={() => setPreviewImage(null)} title="Close preview">✕</button>
             <img src={previewImage} alt="Enlarged view" className="enlarged-preview-img" />
             <div className="preview-actions no-print">
-              <a href={previewImage} download="ayurchain-image.png" target="_blank" rel="noreferrer" className="secondary-btn btn-sm">
+              <a href={previewImage} download="ervas-image.png" target="_blank" rel="noreferrer" className="secondary-btn btn-sm">
                 ⬇️ Open / Download Image
               </a>
             </div>
@@ -1552,7 +1552,7 @@ function App() {
 
       {/* ─── FOOTER ─── */}
       <footer className="main-footer no-print">
-        <p>© 2025 AyurChain Ledger Solutions · Premium Herb Blockchain Verification</p>
+        <p>© 2025 Ervas Ledger Solutions · Premium Herb Tracker</p>
       </footer>
     </div>
   );
